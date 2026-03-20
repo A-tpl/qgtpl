@@ -1,1 +1,72 @@
-*python
+# Python 内置函数全面总结
+
+## 📊 基础必备内置函数（20个最常用）
+
+| 分类 | 函数 | 作用 | 示例 |
+|------|------|------|------|
+| **输入输出** | `print()` | 打印输出 | `print("hello")` |
+| | `input()` | 获取用户输入 | `name = input("姓名: ")` |
+| **类型转换** | `int()` | 转整数 | `int("123") → 123` |
+| | `float()` | 转浮点数 | `float("3.14") → 3.14` |
+| | `str()` | 转字符串 | `str(100) → "100"` |
+| | `bool()` | 转布尔值 | `bool(1) → True` |
+| | `list()` | 转列表 | `list("abc") → ['a','b','c']` |
+| | `tuple()` | 转元组 | `tuple([1,2]) → (1,2)` |
+| | `dict()` | 转字典 | `dict([('a',1)]) → {'a':1}` |
+| | `set()` | 转集合 | `set([1,1,2]) → {1,2}` |
+| **序列操作** | `len()` | 获取长度 | `len([1,2,3]) → 3` |
+| | `range()` | 生成序列 | `list(range(5)) → [0,1,2,3,4]` |
+| | `sum()` | 求和 | `sum([1,2,3]) → 6` |
+| | `max()` | 最大值 | `max([1,5,3]) → 5` |
+| | `min()` | 最小值 | `min([1,5,3]) → 1` |
+| **其他常用** | `type()` | 查看类型 | `type(10) → <class 'int'>` |
+| | `sorted()` | 排序 | `sorted([3,1,2]) → [1,2,3]` |
+| | `enumerate()` | 带索引遍历 | `for i,v in enumerate(['a','b'])` |
+| | `zip()` | 打包多个序列 | `list(zip([1,2],['a','b']))` |
+| | `abs()` | 绝对值 | `abs(-5) → 5` |
+
+## 🚀 进阶内置函数（20个实用）
+
+| 分类 | 函数 | 作用 | 示例 |
+|------|------|------|------|
+| **迭代器相关** | `iter()` | 创建迭代器 | `it = iter([1,2,3])` |
+| | `next()` | 获取下一个元素 | `next(it) → 1` |
+| | `reversed()` | 反转序列 | `list(reversed([1,2])) → [2,1]` |
+| **函数式编程** | `map()` | 映射函数 | `list(map(str,[1,2])) → ['1','2']` |
+| | `filter()` | 过滤元素 | `list(filter(lambda x:x>0,[-1,2])) → [2]` |
+| | `reduce()`* | 累积计算 | `reduce(lambda a,b:a+b,[1,2,3]) → 6` |
+| **对象操作** | `isinstance()` | 类型检查 | `isinstance(10, int) → True` |
+| | `issubclass()` | 子类检查 | `issubclass(Child, Parent)` |
+| | `id()` | 内存地址 | `id(x)` 返回对象唯一标识 |
+| | `hash()` | 哈希值 | `hash("abc")` 用于字典键 |
+| **属性操作** | `getattr()` | 获取属性 | `getattr(obj, 'name')` |
+| | `setattr()` | 设置属性 | `setattr(obj, 'name', 'value')` |
+| | `hasattr()` | 判断属性 | `hasattr(obj, 'name')` |
+| | `delattr()` | 删除属性 | `delattr(obj, 'name')` |
+| **字符串编码** | `chr()` | ASCII转字符 | `chr(65) → 'A'` |
+| | `ord()` | 字符转ASCII | `ord('A') → 65` |
+| | `eval()`* | 执行字符串代码 | `eval("2+3") → 5` |
+| | `exec()`* | 执行代码块 | `exec("x=5")` |
+| **其他高级** | `callable()` | 是否可调用 | `callable(print) → True` |
+| | `globals()` | 全局变量字典 | `globals()` |
+| | `locals()` | 局部变量字典 | `locals()` |
+| | `dir()` | 查看属性方法 | `dir(obj)` |
+| | `help()` | 查看帮助 | `help(print)` |
+
+> *注：`reduce()` 在 Python 3 中移至 `functools` 模块。`eval()` 和 `exec()` 有安全风险，慎用。
+
+## 🎯 核心函数深度解析
+
+### 1. `map()`、`filter()`、`reduce()` 三剑客
+
+```python
+# map: 对每个元素应用函数
+numbers = [1, 2, 3, 4]
+squared = list(map(lambda x: x**2, numbers))  # [1, 4, 9, 16]
+
+# filter: 过滤满足条件的元素
+even = list(filter(lambda x: x % 2 == 0, numbers))  # [2, 4]
+
+# reduce: 累积计算（需从functools导入）
+from functools import reduce
+product = reduce(lambda a, b: a * b, numbers)  # 1 * 2 * 3 * 4 = 24
