@@ -1,0 +1,107 @@
+import json
+import numpy as np
+
+class CoordinateSystem:
+    def __init__(self, axes):
+        self.axes = np.array(axes).T  # 列向量矩阵
+        self.dim = self.axes.shape[0]
+        if not self.is_valid():
+            raise ValueError("坐标系无效：基向量线性相关")
+
+    def is_valid(self):
+        det = np.linalg.det(self.axes)
+        return abs(det) > 1e-10
+
+    def transform_to(self, target_axes, v_cur):
+        target_cs = CoordinateSystem(target_axes)
+        x_std = self.axes @ v_cur
+        v_target = np.linalg.solve(target_cs.axes, x_std)
+        return target_cs, v_target
+
+    def projection(self, target_axes, v_cur):
+        target_cs = CoordinateSystem(target_axes)
+        x_std = self.axes @ v_cur
+        proj = []
+        for i in range(target_cs.dim):
+            axis = target_cs.axes[:, i]
+            length = abs(np.dot(x_std, axis)) / np.linalg.norm(axis)
+            proj.append(length)
+        return proj
+
+    def angle(self, target_axes, v_cur):
+        target_cs = CoordinateSystem(target_axes)
+        x_std = self.axes @ v_cur
+        norm_x = np.linalg.norm(x_std)
+        if norm_x < 1e-10:
+            return [np.nan] * target_cs.dim
+        angles = []
+        for i in range(target_cs.dim):
+            axis = target_cs.axes[:, i]
+            cos_theta = np.dot(x_std, axis) / (norm_x * np.linalg.norm(axis))
+            cos_theta = np.clip(cos_theta, -1.0, 1.0)
+            angles.append(np.arccos(cos_theta))
+        return angles
+
+    def area_scale(self, target_axes):
+        target_cs = CoordinateSystem(target_axes)
+        return abs(np.linalg.det(target_cs.axes))
+
+def main():
+    # 读取 JSON 文件
+    with open('input.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # 初始数据
+    initial_vector = np.array(data['vector'], dtype=float)
+    initial_axes = data['axes']
+    tasks = data['tasks']
+
+    # 创建初始坐标系
+    current_cs = CoordinateSystem(initial_axes)
+    current_v = initial_vector
+
+    print("初始坐标系：")
+    print("基向量矩阵（列）：\n", current_cs.axes)
+    print("初始向量坐标：", current_v)
+    print("-" * 50)
+
+    # 执行任务
+    for idx, task in enumerate(tasks):
+        task_type = task['type']
+        target_axes = task['target_axes']
+
+        print(f"任务 {idx+1}: {task_type}")
+
+        # 目标坐标系合法性检查（在方法内部会检查，但我们可以先捕获异常）
+        try:
+            if task_type == 'transfer':
+                new_cs, new_v = current_cs.transform_to(target_axes, current_v)
+                # 更新状态
+                current_cs = new_cs
+                current_v = new_v
+                print("转移后的向量坐标：", new_v)
+                print("新的当前坐标系基矩阵（列）：\n", current_cs.axes)
+
+            elif task_type == 'projection':
+                proj = current_cs.projection(target_axes, current_v)
+                print("各轴投影长度：", proj)
+
+            elif task_type == 'angle':
+                angles = current_cs.angle(target_axes, current_v)
+                print("各轴夹角（弧度）：", angles)
+
+            elif task_type == 'area':
+                scale = current_cs.area_scale(target_axes)
+                print("面积缩放倍数：", scale)
+
+            else:
+                print(f"未知任务类型: {task_type}")
+
+        except ValueError as e:
+            print(f"错误：{e}")
+            # 可决定是否继续或停止
+
+        print("-" * 50)
+
+if __name__ == '__main__':
+    main()
